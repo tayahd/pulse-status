@@ -96,102 +96,163 @@
     -webkit-font-smoothing: antialiased;
     transition: background-image .6s;
   }
-  .wrap { max-width: 1040px; margin: 0 auto; padding: max(16px, env(safe-area-inset-top)) 16px 48px; }
-  @media (min-width: 720px) { .wrap { padding: 28px 28px 64px; } }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px 48px; }
+  @media (min-width: 720px) { .wrap { padding: 0 28px 64px; } }
 
-  /* Top bar */
-  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 28px; }
-  .brand { white-space: nowrap; display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 16px; letter-spacing: -.01em; }
-  .brand svg { width: 28px; height: 28px; }
+  /* Top bar: frosted and sticky so status + refresh stay in reach while scrolling. */
+  header {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    margin: 0 -16px 24px; padding: max(12px, env(safe-area-inset-top)) 16px 12px;
+    background: color-mix(in srgb, var(--bg) 78%, transparent);
+    backdrop-filter: saturate(160%) blur(14px); -webkit-backdrop-filter: saturate(160%) blur(14px);
+    border-bottom: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  }
+  @media (min-width: 720px) { header { margin: 0 -28px 28px; padding: 14px 28px; } }
+  .brand { white-space: nowrap; display: flex; align-items: center; gap: 10px; font-weight: 650; font-size: 16px; letter-spacing: -.01em; }
+  .brand svg { width: 30px; height: 30px; }
+  .brand .live { display: inline-flex; align-items: center; gap: 6px; font-size: 11px; font-weight: 600; color: var(--muted); padding: 3px 8px; border: 1px solid var(--border); border-radius: 999px; }
+  .brand .live::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--c, var(--up)); box-shadow: 0 0 8px var(--c, var(--up)); }
+  @media (max-width: 420px) { .brand .live { display: none; } }
   .bar-actions { display: flex; align-items: center; gap: 8px; }
   .updated { color: var(--muted); font-size: 13px; white-space: nowrap; }
   .icon-btn {
     width: 36px; height: 36px; display: grid; place-items: center;
     border: 1px solid var(--border); background: var(--surface); color: var(--muted);
-    border-radius: 10px; cursor: pointer; transition: color .15s, border-color .15s;
+    border-radius: 11px; cursor: pointer; transition: color .15s, border-color .15s, transform .15s;
   }
   .icon-btn:hover { color: var(--text); border-color: var(--faint); }
+  .icon-btn:active { transform: scale(.94); }
   .icon-btn svg { width: 16px; height: 16px; }
   .icon-btn.spin svg { animation: spin .8s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Hero */
+  /* Hero: tinted by overall status, with the 30-day uptime ring on the right. */
   .hero {
+    --c: var(--up);
+    position: relative; overflow: hidden;
     display: flex; align-items: center; gap: 20px;
-    padding: 24px; border-radius: 20px;
-    background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow);
-    margin-bottom: 16px;
+    padding: 26px 24px; border-radius: 24px;
+    background:
+      radial-gradient(120% 140% at 0% 0%, color-mix(in srgb, var(--c) 14%, transparent), transparent 60%),
+      var(--surface);
+    border: 1px solid color-mix(in srgb, var(--c) 28%, var(--border));
+    box-shadow: var(--shadow);
+    margin-bottom: 14px;
   }
-  .beacon { position: relative; width: 52px; height: 52px; flex: none; display: grid; place-items: center; }
-  .beacon::before, .beacon::after {
-    content: ""; position: absolute; inset: 0; border-radius: 50%;
-    background: var(--c, var(--up)); opacity: .18;
-  }
+  .hero-main { flex: 1; min-width: 0; }
+  .beacon { position: relative; width: 56px; height: 56px; flex: none; display: grid; place-items: center; }
+  .beacon::before, .beacon::after { content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--c); opacity: .18; }
   .beacon::after { animation: ping 2.4s cubic-bezier(0, 0, .2, 1) infinite; opacity: .35; }
-  .beacon i { width: 18px; height: 18px; border-radius: 50%; background: var(--c, var(--up)); box-shadow: 0 0 16px var(--c, var(--up)); position: relative; }
+  .beacon i { width: 20px; height: 20px; border-radius: 50%; background: var(--c); box-shadow: 0 0 18px var(--c); position: relative; }
   @keyframes ping { 0% { transform: scale(.45); opacity: .5; } 80%, 100% { transform: scale(1.35); opacity: 0; } }
   @media (prefers-reduced-motion: reduce) { .beacon::after { animation: none; } }
-  .hero h1 { margin: 0; font-size: clamp(20px, 4.6vw, 28px); line-height: 1.2; letter-spacing: -.02em; font-weight: 700; }
-  .hero p { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--c); margin-bottom: 2px; }
+  .hero h1 { margin: 0; font-size: clamp(21px, 4.8vw, 30px); line-height: 1.15; letter-spacing: -.025em; font-weight: 700; }
+  .hero p { margin: 6px 0 0; color: var(--muted); font-size: 14px; }
   .stale { margin-top: 10px; display: none; font-size: 13px; color: var(--deg); }
   .stale.show { display: block; }
+  .ring { position: relative; width: 84px; height: 84px; flex: none; }
+  .ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring .track { stroke: var(--surface-2); }
+  .ring .val { stroke: var(--c); transition: stroke-dashoffset .8s cubic-bezier(.2, .8, .2, 1); }
+  .ring-label { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+  .ring-label b { font-size: 14px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+  .ring-label span { font-size: 10px; color: var(--faint); text-transform: uppercase; letter-spacing: .06em; }
+  @media (max-width: 520px) { .ring { display: none; } .hero { padding: 20px 18px; gap: 16px; } .beacon { width: 46px; height: 46px; } }
 
   /* KPIs */
-  .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 32px; }
+  .kpis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-bottom: 36px; }
   @media (min-width: 720px) { .kpis { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); min-width: 0; }
-  .kpi .label { color: var(--muted); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
-  .kpi .value { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; box-shadow: var(--shadow); min-width: 0; transition: border-color .15s, transform .15s; }
+  .kpi:hover { border-color: var(--faint); transform: translateY(-1px); }
+  .kpi .label { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: .06em; }
+  .kpi .label svg { width: 26px; height: 26px; padding: 6px; border-radius: 8px; background: var(--surface-2); color: var(--accent); flex: none; }
+  .kpi .value { font-size: 26px; font-weight: 700; letter-spacing: -.02em; margin-top: 10px; font-variant-numeric: tabular-nums; }
   .kpi .value small { font-size: 14px; font-weight: 500; color: var(--muted); margin-left: 2px; }
-  @media (max-width: 520px) { .kpi .value { font-size: 21px; } .updated { font-size: 12px; } }
+  @media (max-width: 520px) { .kpi .value { font-size: 21px; } .updated { font-size: 12px; } .kpi .label { font-size: 11px; letter-spacing: .04em; } .kpi .label svg { display: none; } }
   .kpi .sub { color: var(--faint); font-size: 12px; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   /* Sections */
   h2 { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 12px; display: flex; justify-content: space-between; align-items: baseline; }
   h2 span { text-transform: none; letter-spacing: 0; font-weight: 500; color: var(--faint); }
-  section { margin-bottom: 32px; }
+  section { margin-bottom: 36px; }
 
-  /* Service cards */
-  .services { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
-  @media (min-width: 720px) { .services { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .svc { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); min-width: 0; }
+  /* Service groups: each folds; a group with a problem opens automatically. */
+  .sgroup, .hgroup { border: 1px solid var(--border); border-radius: 20px; background: var(--surface); box-shadow: var(--shadow); margin-bottom: 12px; overflow: hidden; }
+  .sgroup > summary, .hgroup > summary { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 10px; padding: 15px 18px; }
+  .sgroup > summary::-webkit-details-marker, .hgroup > summary::-webkit-details-marker { display: none; }
+  .sgroup > summary:hover, .hgroup > summary:hover { background: color-mix(in srgb, var(--surface-2) 60%, transparent); }
+  .sg-title { font-weight: 650; font-size: 15px; }
+  .sg-blurb { color: var(--faint); font-size: 12.5px; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .sg-count { margin-left: auto; }
+  .sg-blurb + .sg-count { margin-left: 0; }
+  .sg-count { font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); white-space: nowrap; }
+  .sg-count.up { color: var(--up); background: var(--up-soft); } .sg-count.down { color: var(--down); background: var(--down-soft); } .sg-count.degraded { color: var(--deg); background: var(--deg-soft); }
+  .sg-chev { color: var(--faint); transition: transform .2s; font-size: 18px; line-height: 1; }
+  details[open] > summary .sg-chev { transform: rotate(90deg); }
+  .sgroup.down { border-color: color-mix(in srgb, var(--down) 45%, var(--border)); }
+  .sgroup.degraded { border-color: color-mix(in srgb, var(--deg) 40%, var(--border)); }
+  .dot { width: 9px; height: 9px; border-radius: 50%; flex: none; background: var(--up); box-shadow: 0 0 0 4px var(--up-soft); }
+  .dot.down { background: var(--down); box-shadow: 0 0 0 4px var(--down-soft); }
+  .dot.degraded { background: var(--deg); box-shadow: 0 0 0 4px var(--deg-soft); }
+
+  /* Service cards (inside the Core app group) */
+  .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; padding: 0 12px 12px; }
+  .svc { background: var(--surface-2); border: 1px solid transparent; border-radius: 16px; padding: 16px; min-width: 0; transition: border-color .15s; }
+  .svc:hover { border-color: var(--border); }
   .svc-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
-  .svc-name { font-weight: 600; font-size: 16px; }
+  .svc-name { font-weight: 600; font-size: 15.5px; }
   .svc-group { color: var(--faint); font-size: 12px; }
   .pill { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 999px; white-space: nowrap; }
   .pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .pill.up { color: var(--up); background: var(--up-soft); }
   .pill.degraded { color: var(--deg); background: var(--deg-soft); }
   .pill.down { color: var(--down); background: var(--down-soft); }
-  .svc-metrics { display: flex; gap: 20px; margin: 14px 0 8px; }
-  .metric .m-val { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 15px; font-variant-numeric: tabular-nums; }
-  .metric .m-lbl { font-size: 11px; color: var(--faint); text-transform: uppercase; letter-spacing: .06em; }
+  .svc-metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 14px 0 10px; }
+  .metric .m-val { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 14px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .metric .m-lbl { font-size: 10.5px; color: var(--faint); text-transform: uppercase; letter-spacing: .06em; }
   .spark { width: 100%; height: 56px; display: block; overflow: visible; }
   .spark-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--faint); margin-top: 4px; }
   .svc-error { margin-top: 10px; font-size: 13px; color: var(--down); background: var(--down-soft); border-radius: 8px; padding: 6px 10px; font-family: "JetBrains Mono", ui-monospace, monospace; word-break: break-word; }
 
+  /* Compact service rows (other groups) */
+  .srows { display: flex; flex-direction: column; padding: 0 8px 8px; }
+  .srow { display: grid; grid-template-columns: auto minmax(0, 1.6fr) minmax(0, 1fr) 64px 70px 100px; gap: 12px; align-items: center; padding: 10px; border-radius: 12px; }
+  .srow + .srow { border-top: 1px solid var(--border); }
+  .srow:hover { background: var(--surface-2); }
+  .srow-name { display: flex; flex-direction: column; min-width: 0; }
+  .srow-name b { font-weight: 600; font-size: 14px; }
+  .srow-sub { color: var(--faint); font-size: 12px; }
+  .srow-err { color: var(--down); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .srow-spark .spark { height: 26px; }
+  .srow-num { display: flex; align-items: baseline; gap: 3px; font-variant-numeric: tabular-nums; }
+  .srow-num b { font-size: 14px; } .srow-num span { color: var(--faint); font-size: 11px; }
+  .srow .pill { justify-self: end; }
+  @media (max-width: 720px) { .srow { grid-template-columns: auto minmax(0, 1fr) auto; } .srow-spark, .srow-num { display: none; } .sg-blurb { display: none; } .sg-blurb + .sg-count { margin-left: auto; } }
+
   /* 90-day bars */
-  .history { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
-  .h-row { padding: 16px 18px; border-bottom: 1px solid var(--border); }
-  .h-row:last-child { border-bottom: 0; }
-  .h-top { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px; }
+  .h-row { padding: 8px 18px; }
+  .h-top { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
   .h-top b { font-weight: 600; }
   .h-top span { color: var(--muted); font-variant-numeric: tabular-nums; }
-  .bars { display: flex; gap: 2px; height: 32px; }
-  .bars i { flex: 1 1 0; min-width: 0; border-radius: 2px; background: var(--none); transition: transform .12s, opacity .12s; }
-  .bars i:hover { transform: scaleY(1.12); }
+  .bars { display: flex; gap: 2px; height: 30px; }
+  .bars i { flex: 1 1 0; min-width: 0; border-radius: 3px; background: var(--none); transition: transform .12s, opacity .12s; }
+  .bars i:hover { transform: scaleY(1.15); }
   .bars i.u { background: var(--up); }
   .bars i.d1 { background: var(--deg); }
   .bars i.d2 { background: var(--down); }
-  .h-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--faint); margin-top: 6px; }
+  .h-axis { display: flex; justify-content: space-between; font-size: 11px; color: var(--faint); padding: 4px 18px 16px; }
   @media (max-width: 520px) { .bars i:nth-child(-n+45) { display: none; } .h-axis .ninety { display: none; } }
   @media (min-width: 521px) { .h-axis .fortyfive { display: none; } }
 
-  /* Incidents */
-  .incidents { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
-  .inc { display: flex; gap: 14px; padding: 14px 18px; border-bottom: 1px solid var(--border); }
-  .inc:last-child { border-bottom: 0; }
-  .inc-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; flex: none; background: var(--up); }
+  /* Incidents: a vertical timeline */
+  .incidents { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: var(--shadow); padding: 6px 0; }
+  .inc { position: relative; display: flex; gap: 14px; padding: 12px 18px; }
+  .inc::before { content: ""; position: absolute; left: 22px; top: 0; bottom: 0; width: 2px; background: var(--border); }
+  .inc:first-child::before { top: 20px; } .inc:last-child::before { bottom: calc(100% - 20px); }
+  .inc:only-child::before { display: none; }
+  .inc-dot { position: relative; width: 10px; height: 10px; border-radius: 50%; margin-top: 6px; flex: none; background: var(--up); box-shadow: 0 0 0 4px var(--surface); }
   .inc-dot.open { background: var(--down); box-shadow: 0 0 0 4px var(--down-soft); }
   .inc-body { min-width: 0; flex: 1; }
   .inc-title { font-weight: 600; font-size: 14px; display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
@@ -203,14 +264,15 @@
   /* Tools */
   .tools { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
   @media (min-width: 720px) { .tools { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .tool { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; box-shadow: var(--shadow); }
+  .tool { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; padding: 18px; box-shadow: var(--shadow); }
   .tool h3 { margin: 0 0 4px; font-size: 15px; }
   .tool p { margin: 0 0 14px; color: var(--muted); font-size: 13px; }
   .btn {
     display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer;
     background: var(--text); color: var(--bg); font: 600 13px Inter, system-ui, sans-serif;
-    padding: 9px 14px; border-radius: 10px; text-decoration: none;
+    padding: 10px 15px; border-radius: 11px; text-decoration: none; transition: transform .15s, opacity .15s;
   }
+  .btn:active { transform: scale(.97); }
   .btn:disabled { opacity: .6; cursor: default; }
   .probe-out { margin-left: 10px; font-size: 13px; color: var(--muted); font-family: "JetBrains Mono", ui-monospace, monospace; }
   .notif-rows { display: grid; gap: 8px; font-size: 13px; }
@@ -227,8 +289,8 @@
   }
   #tip.show { opacity: 1; transform: none; }
 
-  .loading .svc, .loading .kpi, .loading .hero { opacity: .5; }
-  .skeleton { height: 140px; border-radius: var(--radius); background: var(--surface-2); }
+  .skeleton { height: 140px; border-radius: 20px; background: var(--surface-2); animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: .55; } }
 </style>
 </head>
 <body>
@@ -237,6 +299,7 @@
     <div class="brand">
       <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="9" fill="var(--text)"/><path d="M6 17h5l2.5-6 4 11 3-7.5 1.5 2.5H26" fill="none" stroke="var(--bg)" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       Pulse Status
+      <span class="live" id="live">Live</span>
     </div>
     <div class="bar-actions">
       <span class="updated" id="updated">Loading…</span>
@@ -250,11 +313,16 @@
   </header>
 
   <div class="hero" id="hero">
-    <div class="beacon" id="beacon"><i></i></div>
-    <div>
+    <div class="beacon"><i></i></div>
+    <div class="hero-main">
+      <div class="eyebrow" id="eyebrow">Status</div>
       <h1 id="headline">Checking status…</h1>
       <p id="subline">Fetching the latest results from the monitor.</p>
       <div class="stale" id="stale"></div>
+    </div>
+    <div class="ring" id="ring" aria-hidden="true">
+      <svg viewBox="0 0 84 84"><circle class="track" cx="42" cy="42" r="36" fill="none" stroke-width="7"/><circle class="val" id="ring-val" cx="42" cy="42" r="36" fill="none" stroke-width="7" stroke-linecap="round" stroke-dasharray="226.2" stroke-dashoffset="226.2"/></svg>
+      <div class="ring-label"><b id="ring-pct">—</b><span>30 days</span></div>
     </div>
   </div>
 
@@ -262,12 +330,12 @@
 
   <section>
     <h2>Services <span id="svc-note">Last 24 hours</span></h2>
-    <div class="services" id="services"><div class="skeleton"></div><div class="skeleton"></div></div>
+    <div id="services"><div class="skeleton"></div></div>
   </section>
 
   <section>
     <h2>Uptime history <span>Daily</span></h2>
-    <div class="history" id="history"></div>
+    <div id="history"></div>
   </section>
 
   <section>
@@ -385,6 +453,13 @@
   addEventListener('scroll', hideTip, { passive: true });
 
   // ---------- render ----------
+  const svgIcon = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${d}</svg>`;
+  const ICONS = {
+    up: svgIcon('<path d="M12 3a9 9 0 1 0 9 9"/><path d="M12 7v5l3 2"/>'),
+    resp: svgIcon('<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>'),
+    inc: svgIcon('<path d="M12 9v4M12 17h.01"/><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>'),
+    last: svgIcon('<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/>'),
+  };
   function sparkline(svc) {
     const pts = svc.recent || [];
     const W = 300, H = 56;
@@ -412,7 +487,10 @@
     const deg = svcs.filter(s => s.status === 'degraded');
     const overall = down.length ? 'down' : deg.length ? 'degraded' : 'up';
     document.body.dataset.overall = overall;
-    $('beacon').style.setProperty('--c', `var(--${overall === 'up' ? 'up' : overall === 'down' ? 'down' : 'deg'})`);
+    const tone = `var(--${overall === 'up' ? 'up' : overall === 'down' ? 'down' : 'deg'})`;
+    $('hero').style.setProperty('--c', tone);
+    $('live').style.setProperty('--c', tone);
+    $('eyebrow').textContent = overall === 'up' ? 'Operational' : overall === 'down' ? 'Outage' : 'Degraded';
 
     if (!svcs.length) {
       $('headline').textContent = 'Waiting for the first check';
@@ -446,22 +524,36 @@
     const inc30 = (data.incidents || []).filter(i => Date.now() - new Date(i.start) < 30 * 864e5);
     const downMs30 = inc30.reduce((a, i) => a + ((i.end ? new Date(i.end) : Date.now()) - new Date(i.start)), 0);
     const last = (data.incidents || [])[0];
+    $('ring-pct').textContent = up30 == null ? '—' : `${pct(up30)}%`;
+    // Ring fills from 95% (empty) to 100% (full) so small dips are visible.
+    $('ring-val').style.strokeDashoffset = up30 == null ? 226.2 : 226.2 * (1 - Math.max(0, Math.min(1, (up30 - 95) / 5)));
     $('kpis').innerHTML = [
-      ['Uptime · 30d', `${pct(up30)}<small>%</small>`, 'Lowest across services'],
-      ['Response · 24h', avg == null ? '—' : `${avg}<small>ms</small>`, `${web?.name || 'Website'} average`],
-      ['Incidents · 30d', inc30.length, inc30.length ? `${dur(downMs30)} total downtime` : 'No downtime'],
-      ['Last incident', last ? ago(last.end || last.start).replace(/^in /, '') : 'None', last ? `${last.name}${last.end ? '' : ' · ongoing'}` : 'Clean record'],
-    ].map(([l, v, s]) => `<div class="kpi"><div class="label">${l}</div><div class="value">${v}</div><div class="sub">${esc(s)}</div></div>`).join('');
+      ['up', 'Uptime · 30d', `${pct(up30)}<small>%</small>`, 'Lowest across services'],
+      ['resp', 'Response · 24h', avg == null ? '—' : `${avg}<small>ms</small>`, `${web?.name || 'Website'} average`],
+      ['inc', 'Incidents · 30d', inc30.length, inc30.length ? `${dur(downMs30)} total downtime` : 'No downtime'],
+      ['last', 'Last incident', last ? ago(last.end || last.start).replace(/^in /, '') : 'None', last ? `${last.name}${last.end ? '' : ' · ongoing'}` : 'Clean record'],
+    ].map(([i, l, v, s]) => `<div class="kpi"><div class="label">${ICONS[i]}${l}</div><div class="value">${v}</div><div class="sub">${esc(s)}</div></div>`).join('');
 
-    // Services
-    $('services').innerHTML = svcs.map(s => {
+    // Services, organized into groups. A group with a problem opens automatically.
+    const SECTIONS = [
+      ['core', 'Core app', 'The website, sign-in and your database', s => ['web', 'auth', 'db'].includes(s.id)],
+      ['sync', 'Bank sync', 'Supabase Edge Functions that talk to Plaid', s => s.id === 'functions' || s.id.startsWith('fn-')],
+    ];
+    const placed = new Set();
+    const groups = SECTIONS.map(([key, title, blurb, test]) => {
+      const list = svcs.filter(s => test(s) && !placed.has(s.id));
+      list.forEach(s => placed.add(s.id));
+      return { key, title, blurb, list };
+    });
+    const rest = svcs.filter(s => !placed.has(s.id));
+    if (rest.length) groups.push({ key: 'other', title: 'Other', blurb: '', list: rest });
+    const shown = groups.filter(g => g.list.length);
+    const label = st => st === 'up' ? 'Operational' : st === 'degraded' ? 'Slow' : 'Down';
+    const card = s => {
       const r = s.recent || [];
       const first = r[0] ? timeFmt.format(new Date(r[0][0] * 1000)) : '';
       return `<div class="svc">
-        <div class="svc-head">
-          <div><div class="svc-name">${esc(s.name)}</div><div class="svc-group">${esc(s.group)}</div></div>
-          <span class="pill ${s.status}">${s.status === 'up' ? 'Operational' : s.status === 'degraded' ? 'Slow' : 'Down'}</span>
-        </div>
+        <div class="svc-head"><div><div class="svc-name">${esc(s.name)}</div><div class="svc-group">${esc(s.group)}</div></div><span class="pill ${s.status}">${label(s.status)}</span></div>
         <div class="svc-metrics">
           <div class="metric"><div class="m-val">${s.lastMs ?? '—'}ms</div><div class="m-lbl">Now</div></div>
           <div class="metric"><div class="m-val">${avg24(s) ?? '—'}ms</div><div class="m-lbl">Avg 24h</div></div>
@@ -472,11 +564,35 @@
         <div class="spark-axis"><span>${first}</span><span>${s.status === 'up' ? 'up' : s.status} for ${dur(Date.now() - new Date(s.since))}</span><span>now</span></div>
         ${s.status === 'down' && s.lastError ? `<div class="svc-error">${esc(s.lastError)}</div>` : ''}
       </div>`;
+    };
+    const row = s => `<div class="srow ${s.status}">
+        <span class="dot ${s.status}"></span>
+        <div class="srow-name"><b>${esc(s.name)}</b>${s.status === 'down' && s.lastError ? `<span class="srow-err">${esc(s.lastError)}</span>` : `<span class="srow-sub">${esc(s.group)} · ${s.status === 'up' ? 'up' : s.status} for ${dur(Date.now() - new Date(s.since))}</span>`}</div>
+        <div class="srow-spark">${sparkline(s)}</div>
+        <div class="srow-num"><b>${s.lastMs ?? '—'}</b><span>ms</span></div>
+        <div class="srow-num"><b>${pct(uptime24(s))}</b><span>% 24h</span></div>
+        <span class="pill ${s.status}">${label(s.status)}</span>
+      </div>`;
+    // Keep each group's open/closed state across the 30-second re-renders.
+    const wasOpen = {};
+    document.querySelectorAll('#services details[data-k]').forEach(d => { wasOpen[d.dataset.k] = d.open; });
+    $('services').innerHTML = shown.map(g => {
+      const bad = g.list.filter(s => s.status !== 'up').length;
+      const state = g.list.some(s => s.status === 'down') ? 'down' : bad ? 'degraded' : 'up';
+      const open = bad || (wasOpen[g.key] ?? g.key === 'core');
+      return `<details class="sgroup ${state}" data-k="${g.key}" ${open ? 'open' : ''}>
+        <summary><span class="dot ${state}"></span><span class="sg-title">${g.title}</span><span class="sg-blurb">${esc(g.blurb)}</span><span class="sg-count ${state}">${g.list.length - bad}/${g.list.length} up</span><span class="sg-chev">›</span></summary>
+        ${g.key === 'core' ? `<div class="services">${g.list.map(card).join('')}</div>` : `<div class="srows">${g.list.map(row).join('')}</div>`}
+      </details>`;
     }).join('') || '<div class="empty">No services reported yet.</div>';
+    // When every Supabase service fails the same way, say so once at the top.
+    const sbDown = svcs.filter(s => s.id !== 'web' && s.status === 'down');
+    const common = sbDown.length > 1 && sbDown.every(s => s.lastError === sbDown[0].lastError) ? sbDown[0].lastError : '';
+    if (common) $('subline').textContent = `${sbDown.length} services share one cause: ${common}`;
 
-    // 90-day history
+    // 90-day history, in the same groups.
     const days = [...Array(90)].map((_, i) => new Date(Date.now() - (89 - i) * 864e5));
-    $('history').innerHTML = svcs.map(s => {
+    const hrow = s => {
       const bars = days.map(d => {
         const k = dayKey(d), x = s.daily?.[k];
         let cls = '', up = null;
@@ -489,9 +605,15 @@
       return `<div class="h-row">
         <div class="h-top"><b>${esc(s.name)}</b><span>${pct(uptimeDays(s, 90))}% uptime</span></div>
         <div class="bars">${bars}</div>
-        <div class="h-axis"><span class="ninety">90 days ago</span><span class="fortyfive">45 days ago</span><span>Today</span></div>
       </div>`;
-    }).join('');
+    };
+    const histOpen = {};
+    document.querySelectorAll('#history details[data-k]').forEach(d => { histOpen[d.dataset.k] = d.open; });
+    $('history').innerHTML = shown.map(g => `<details class="hgroup" data-k="${g.key}" ${(histOpen[g.key] ?? g.key === 'core') ? 'open' : ''}>
+        <summary><span class="sg-title">${g.title}</span><span class="sg-count">${pct(Math.min(...g.list.map(s => uptimeDays(s, 90) ?? 100)))}% lowest</span><span class="sg-chev">›</span></summary>
+        ${g.list.map(hrow).join('')}
+        <div class="h-axis"><span class="ninety">90 days ago</span><span class="fortyfive">45 days ago</span><span>Today</span></div>
+      </details>`).join('');
 
     // Incidents
     const inc = data.incidents || [];
